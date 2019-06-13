@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Cron&ocirc;metro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        h1 {
+            font-family: "Impact";
+            font-size: 48px;
+        }
+        .red {
+            background-color: lightcoral;
+        }
+    </style>
+</head>
+<body>
+    <span style="display: flex;">
+        <div style="align-self: center;">
+            <button type="button" onclick="startCron()">Start</button>
+            <button type="button" onclick="stopCron()">Stop</button>
+            <button type="button" onclick="resetCron()">Reset</button>
+        </div>
+        <div style="align-self: center; margin-left: 20px; ">
+            <h1 id="tempo" style="text-align: center; width: 200px; margin: 0px;"></h1>
+        </div>
+    </span>
+    <script type="text/javascript">
+        let el = document.getElementById("tempo");
+        let t = new Date(0);
+        let interval = 0;
+        let sndPlaying = false;
+        let snd = new Audio();
+        snd.src = "klaxon.mp3";
+
+        formatTime = function(t) {
+            let mm = "0" + t.getMinutes();
+            let ss = "0" + t.getSeconds();
+            return mm.substring(mm.length-2) + ":" + ss.substring(ss.length-2);
+        };
+
+        updateCron = function() {
+            t.setTime(t.getTime() - 1000);
+            if (t.getTime() > 10000) {
+                el.classList.remove("red");
+            } else {
+                if ((t.getTime()/1000)%2==0) {
+                    el.classList.add("red");
+                } else {
+                    el.classList.remove("red");
+                }
+                if (t.getTime() < 1000) {
+                    clearInterval(interval);
+                } else if ((t.getTime() < 5000) && (!sndPlaying)) {
+                    snd.play();
+                    sndPlaying = !sndPlaying;
+                }
+            }
+            el.innerHTML = formatTime(t);
+        };
+
+        startCron = function() {
+            interval = setInterval(updateCron, 1000);
+            console.log("set interval " + interval);
+        };
+
+        stopCron = function() {
+            snd.pause();
+            sndPlaying=false;
+            clearInterval(interval);
+        };
+
+        resetCron = function() {
+            t.setMinutes(5);
+            t.setSeconds(00);
+            stopCron();
+            el.innerHTML = formatTime(t);
+            el.classList.remove("red");
+            snd.pause();
+            snd.currentTime=0;
+            sndPlaying=false;
+        };        
+        resetCron();
+    </script>
+</body>
+</html>
